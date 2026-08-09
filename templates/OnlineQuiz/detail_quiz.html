@@ -1,0 +1,34 @@
+{% extends 'OnlineQuiz/base.html' %}
+
+{% block title %}{{ quiz.title }} — Online Quiz{% endblock %}
+
+{% block content %}
+    <div class="quiz-detail">
+        <h1 class="page-title">{{ quiz.title }}</h1>
+        <p class="quiz-detail-meta">👤 Автор: {{ quiz.author.username }} · ❓ {{ quiz.questions.count }} питань</p>
+
+        {% if quiz.description %}
+            <p class="quiz-detail-description">{{ quiz.description }}</p>
+        {% endif %}
+
+        {% if quiz.questions.all %}
+            <div class="question-list">
+                {% for question in quiz.questions.all %}
+                    <div class="question-block">
+                        <h3>{{ forloop.counter }}. {{ question.text }}</h3>
+                        <ul class="choice-list">
+                            {% for choice in question.choices.all %}
+                                <li class="{% if choice.is_correct %}choice-correct{% endif %}">
+                                    {{ choice.text }}
+                                    {% if choice.is_correct %}{% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="empty-state">Немає жодної вікторини</p>
+        {% endif %}
+    </div>
+{% endblock %}

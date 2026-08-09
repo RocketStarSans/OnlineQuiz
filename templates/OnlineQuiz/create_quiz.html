@@ -1,0 +1,14 @@
+{% extends 'OnlineQuiz/base.html' %}
+
+{% block title %}Створення вікторини — Online Quiz{% endblock %}
+
+{% block content %}
+    <div class="auth-card">
+        <h2>Нова вікторина</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn-submit">Далі: додати питання →</button>
+        </form>
+    </div>
+{% endblock %}

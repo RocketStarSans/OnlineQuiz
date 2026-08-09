@@ -1,0 +1,14 @@
+{% extends 'OnlineQuiz/base.html' %}
+
+{% block title %}Реєстрація — Online Quiz{% endblock %}
+
+{% block content %}
+    <div class="auth-card">
+        <h2>Реєстрація</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn-submit btn-submit-green">Зареєструватися</button>
+        </form>
+    </div>
+{% endblock %}

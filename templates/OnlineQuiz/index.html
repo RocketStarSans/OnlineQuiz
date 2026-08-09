@@ -1,0 +1,19 @@
+{% extends 'OnlineQuiz/base.html' %}
+
+{% block title %}Головна — Online Quiz{% endblock %}
+
+{% block content %}
+    <div class="hero">
+        <h1 class="hero-title">Ласкаво просимо до OnlineQuiz!</h1>
+        <p class="hero-subtitle">
+            Створюйте власні інтерактивні вікторини або проходьте тести від інших!
+        </p>
+
+        {% if user.is_authenticated %}
+            <div class="welcome-box">
+                <h3>Привіт, {{ user.username }}! 👋</h3>
+                <a href="#" class="btn-create">Створити вікторину</a>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
