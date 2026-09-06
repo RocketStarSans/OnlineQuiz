@@ -1,0 +1,74 @@
+{% extends 'OnlineQuiz/base.html' %}
+
+{% block title %}Профіль — {{ user.username }}{% endblock %}
+
+{% block content %}
+    <div class="profile-layout">
+        <div class="profile-sidebar">
+            {% if user.avatar %}
+            <img src="{{ user.avatar.url }}" class="profile-avatar-lg" alt="{{ user.username }}">
+            {% else %}
+                <div class="profile-avatar-lg">{{ user.username|first|upper }}</div>
+            {% endif %}
+            <h2 class="mb-1">{{ user.username }}</h2>
+            {% if user.bio %}
+                <p class="text-muted">{{ user.bio }}</p>
+            {% endif %}
+            <p class="text-muted small mb-3">{{ user.email }}</p>
+
+            <div class="profile-level-badge mb-3">Рівень {{ level }}</div>
+
+            <div class="profile-xp-bar">
+                <div class="profile-xp-bar-fill" style="width: {{ xp_progress_percent }}%"></div>
+            </div>
+            <p class="text-muted small mt-1 mb-3">{{ xp_into_level }} / 50 XP до наступного рівня</p>
+
+            <a href="{% url 'edit_profile' %}" class="btn btn-outline-secondary btn-sm w-100">
+                <i class="bi bi-pencil-fill"></i> Редагувати профіль
+            </a>
+        </div>
+
+        <div class="profile-main">
+            <div class="profile-stats-row mb-4">
+                <div class="profile-stat">
+                    <div class="profile-stat-value">⭐ {{ user.xp }}</div>
+                    <div class="profile-stat-label">Загальний XP</div>
+                </div>
+                <div class="profile-stat">
+                    <div class="profile-stat-value">📚 {{ quizzes.count }}</div>
+                    <div class="profile-stat-label">Вікторин створено</div>
+                </div>
+                <div class="profile-stat">
+                    <div class="profile-stat-value">❓ {{ total_questions }}</div>
+                    <div class="profile-stat-label">Питань додано</div>
+                </div>
+            </div>
+
+            <h4 class="mb-3">Мої вікторини ({{ quizzes.count }})</h4>
+
+            {% if quizzes %}
+                <div class="row row-cols-1 row-cols-md-2 g-3">
+                    {% for quiz in quizzes %}
+                        <div class="col">
+                            <a href="{% url 'detail_quiz' quiz.pk %}" class="text-decoration-none">
+                                <div class="card h-100 shadow-sm border-0">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ quiz.title }}</h5>
+                                        {% if quiz.description %}
+                                            <p class="card-text text-muted">{{ quiz.description|truncatewords:15 }}</p>
+                                        {% endif %}
+                                    </div>
+                                    <div class="card-footer bg-transparent border-0 text-muted small">
+                                        ❓ {{ quiz.questions.count }} питань
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">Ти ще не створила жодної вікторини.</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

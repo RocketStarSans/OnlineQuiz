@@ -1,0 +1,52 @@
+{% extends 'OnlineQuiz/base.html' %}
+
+{% block title %}Проходження — {{ quiz.title }}{% endblock %}
+
+{% block content %}
+    <div class="card shadow-sm border-0 mx-auto" style="max-width: 600px;">
+        <div class="card-body">
+            <p class="text-muted">Питання {{ question_number }} з {{ total }}</p>
+            <div class="progress mb-3" style="height:6px;">
+                <div class="progress-bar bg-success" style="width: {{ progress_percent }}%"></div>
+            </div>
+            <h4 class="mb-4">{{ question.text }}</h4>
+
+            {% if answered %}
+                <ul class="list-group mb-3">
+                    {% for choice in question.choices.all %}
+                        <li class="list-group-item
+                            {% if choice.id in correct_choice_ids and choice.id in selected_choice_ids %}list-group-item-success
+                            {% elif choice.id in correct_choice_ids %}list-group-item-warning
+                            {% elif choice.id in selected_choice_ids %}list-group-item-danger{% endif %}">
+                            {{ choice.text }}
+                            {% if choice.id in correct_choice_ids %} ✓{% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                {% if is_correct %}
+                    <p class="text-success fw-bold">Правильно! 🎉</p>
+                {% else %}
+                    <p class="text-danger fw-bold">Неправильно.</p>
+                {% endif %}
+
+                {% if finished %}
+                    <a href="{% url 'quiz_result' quiz.id %}" class="btn btn-primary w-100">Переглянути результат →</a>
+                {% else %}
+                    <a href="{% url 'take_quiz' quiz.id %}" class="btn btn-primary w-100">Наступне питання →</a>
+                {% endif %}
+            {% else %}
+                <form method="post">
+                    {% csrf_token %}
+                    {% for choice in question.choices.all %}
+                        <div class="form-check border rounded p-2 mb-2">
+                            <input class="form-check-input" type="checkbox" name="choice" value="{{ choice.id }}" id="choice{{ choice.id }}">
+                            <label class="form-check-label w-100" for="choice{{ choice.id }}">{{ choice.text }}</label>
+                        </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary w-100 mt-3">Відповісти</button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,113 @@
+{% extends 'OnlineQuiz/base.html' %}
+
+{% block title %}Вікторини — Online Quiz{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4 fw-bold">Всі вікторини</h1>
+
+    <div id="quizArea">
+        {% if quizzes %}
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                {% for quiz in quizzes %}
+                    <div class="col">
+                        <div class="card h-100 shadow-sm border-0 quiz-card"
+                             {% if quiz.created_by == user %}
+                             data-can-manage="1"
+                             data-edit-url="{% url 'edit_quiz' quiz.pk %}"
+                             data-delete-url="{% url 'delete_quiz' quiz.pk %}"
+                             {% endif %}>
+                            <a href="{% url 'detail_quiz' quiz.pk %}" class="text-decoration-none stretched-link-area">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ quiz.title }}</h5>
+                                    {% if quiz.description %}
+                                        <p class="card-text text-muted">{{ quiz.description|truncatewords:20 }}</p>
+                                    {% endif %}
+                                </div>
+                                <div class="card-footer bg-transparent border-0 d-flex justify-content-between text-muted small">
+                                    <span>👤 {{ quiz.created_by.username }}</span>
+                                    <span>❓ {{ quiz.questions.count }} питань</span>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-muted">Поки що немає жодної вікторини. Клацни правою кнопкою миші на порожньому місці, щоб створити першу!</p>
+        {% endif %}
+    </div>
+
+    <!-- Меню картки: редагувати / видалити / скасувати -->
+    <div id="quizContextMenu" class="quiz-context-menu d-none">
+        <button type="button" data-action="edit" title="Редагувати"><i class="bi bi-pencil-fill"></i></button>
+        <button type="button" data-action="delete" title="Видалити"><i class="bi bi-trash-fill"></i></button>
+        <button type="button" data-action="cancel" title="Скасувати"><i class="bi bi-arrow-return-left"></i></button>
+    </div>
+
+    <!-- Меню порожнього місця: тільки плюсик -->
+    <div id="emptyContextMenu" class="quiz-context-menu d-none">
+        <button type="button" data-action="create" title="Створити вікторину"><i class="bi bi-plus-lg"></i></button>
+    </div>
+
+    <!-- Прихована форма для видалення (POST, з CSRF) -->
+    <form id="deleteQuizForm" method="post" class="d-none">
+        {% csrf_token %}
+    </form>
+
+    <script>
+        const cardMenu = document.getElementById('quizContextMenu');
+        const emptyMenu = document.getElementById('emptyContextMenu');
+        const deleteForm = document.getElementById('deleteQuizForm');
+        const quizArea = document.getElementById('quizArea');
+        let activeCard = null;
+
+        function hideMenus() {
+            cardMenu.classList.add('d-none');
+            emptyMenu.classList.add('d-none');
+        }
+
+        document.addEventListener('contextmenu', (e) => {
+            const card = e.target.closest('.quiz-card[data-can-manage]');
+
+            if (card) {
+                e.preventDefault();
+                activeCard = card;
+                cardMenu.style.top = `${e.pageY}px`;
+                cardMenu.style.left = `${e.pageX}px`;
+                cardMenu.classList.remove('d-none');
+                emptyMenu.classList.add('d-none');
+            } else if (!e.target.closest('.quiz-card')) {
+                e.preventDefault();
+                emptyMenu.style.top = `${e.pageY}px`;
+                emptyMenu.style.left = `${e.pageX}px`;
+                emptyMenu.classList.remove('d-none');
+                cardMenu.classList.add('d-none');
+            }
+        });
+
+        document.addEventListener('click', hideMenus);
+
+        cardMenu.addEventListener('click', (e) => {
+            const action = e.target.closest('button')?.dataset.action;
+            if (!action || !activeCard) return;
+
+            if (action === 'edit') {
+                window.location.href = activeCard.dataset.editUrl;
+            } else if (action === 'delete') {
+                if (confirm('Видалити цю вікторину назавжди?')) {
+                    deleteForm.action = activeCard.dataset.deleteUrl;
+                    deleteForm.submit();
+                }
+            }
+            hideMenus();
+        });
+
+        emptyMenu.addEventListener('click', (e) => {
+            const action = e.target.closest('button')?.dataset.action;
+            if (action === 'create') {
+                window.location.href = "{% url 'create_quiz' %}";
+            }
+            hideMenus();
+        });
+    </script>
+{% endblock %}

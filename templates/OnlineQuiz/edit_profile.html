@@ -1,0 +1,14 @@
+{% extends 'OnlineQuiz/base.html' %}
+
+{% block title %}Редагування профілю{% endblock %}
+
+{% block content %}
+    <div class="auth-card">
+        <h2>Редагувати профіль</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn-submit">Зберегти зміни</button>
+        </form>
+    </div>
+{% endblock %}

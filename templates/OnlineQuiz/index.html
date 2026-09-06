@@ -12,7 +12,7 @@
         {% if user.is_authenticated %}
             <div class="welcome-box">
                 <h3>Привіт, {{ user.username }}! 👋</h3>
-                <a href="#" class="btn-create">Створити вікторину</a>
+                <a href="{% url 'create_quiz' %}" class="btn-create">Створити вікторину</a>
             </div>
         {% endif %}
     </div>
